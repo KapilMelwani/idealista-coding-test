@@ -2,10 +2,8 @@ package com.idealista.infrastructure.persistence;
 
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryPersistence {
@@ -35,5 +33,46 @@ public class InMemoryPersistence {
         pictures.add(new PictureVO(8, "http://www.idealista.com/pictures/8", "HD"));
     }
 
-    //TODO crea los métodos que necesites
+    public List<AdVO> getAds() {
+        return ads;
+    }
+
+    public PictureVO getPicturesById(Integer pictureId) {
+        pictures.stream().map(
+            pictureVO -> {
+                return pictureVO.getId().equals(pictureId) ? pictureVO : null;
+            }
+        );
+        return null;
+    }
+
+    public void updateAds(List<AdVO> adVOList) {
+        for(int i=0;i<ads.size();i++){
+            for(AdVO adVO : adVOList) {
+               if(ads.get(i).getId().equals(adVO.getId())){
+                   ads.set(i,adVO);
+               }
+            }
+        }
+    }
+
+    public List<AdVO> filterPublicAds() {
+        List<AdVO> publicAdVOList = ads.stream().filter(
+            adVO -> adVO.getScore()>=40
+        ).sorted(Comparator.comparing(AdVO::getScore)).collect(Collectors.toList());
+        return publicAdVOList;
+    }
+
+    public List<AdVO> findAll() {
+        return ads;
+    }
+
+    public Integer adsAverage() {
+        Integer countScore = 0;
+        for(AdVO ad : ads) {
+            countScore += ad.getScore();
+        }
+        Integer avg = countScore/ads.size();
+        return avg;
+    }
 }
