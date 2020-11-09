@@ -34,10 +34,19 @@ public class InMemoryPersistence {
         pictures.add(new PictureVO(8, "http://www.idealista.com/pictures/8", "HD"));
     }
 
+    /**
+     * Get all ads
+     * @return List<AdVO>
+     */
     public List<AdVO> getAds() {
         return ads;
     }
 
+    /**
+     * Get picture by ad picture id
+     * @param pictureId
+     * @return PictureVO
+     */
     public PictureVO getPicturesById(Integer pictureId) {
         pictures.stream().map(
             pictureVO -> {
@@ -47,6 +56,10 @@ public class InMemoryPersistence {
         return null;
     }
 
+    /**
+     * Method to update ads of List<AdVo>
+     * @param adVOList
+     */
     public void updateAds(List<AdVO> adVOList) {
         for(int i=0;i<ads.size();i++){
             for(AdVO adVO : adVOList) {
@@ -57,6 +70,11 @@ public class InMemoryPersistence {
         }
     }
 
+    /**
+     * Method to filter ads with score greather than IRRELEVANT_SCORE
+     * to return it to public users
+     * @return List<AdVO>
+     */
     public List<AdVO> filterPublicAds() {
         List<AdVO> publicAdVOList = ads.stream().filter(
             adVO -> adVO.getScore()>= ScoreValuesConfiguration.IRRELEVANT_AD_SCORE
@@ -64,10 +82,10 @@ public class InMemoryPersistence {
         return publicAdVOList;
     }
 
-    public List<AdVO> findAll() {
-        return ads;
-    }
-
+    /**
+     * Calculate ads avg
+     * @return
+     */
     public Integer adsAverage() {
         Integer countScore = 0;
         for(AdVO ad : ads) {

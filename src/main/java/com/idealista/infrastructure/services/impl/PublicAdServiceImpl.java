@@ -18,7 +18,7 @@ public class PublicAdServiceImpl implements IPublicAdService {
 
 	@Override
 	public List<PublicAd> getPublicAds() throws Exception {
-		List<AdVO> adVOList = inMemoryPersistence.findAll();
+		List<AdVO> adVOList = inMemoryPersistence.getAds();
 		if(!verifyIfScoreCalculated(adVOList)) {
 			List<AdVO> adVOListFiltered = inMemoryPersistence.filterPublicAds();
 			List<PublicAd> qualityAds = ObjectMapper.mapAll(adVOListFiltered,PublicAd.class);

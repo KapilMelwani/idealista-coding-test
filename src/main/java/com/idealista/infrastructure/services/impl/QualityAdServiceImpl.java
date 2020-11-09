@@ -18,7 +18,7 @@ public class QualityAdServiceImpl implements IQualityAdService {
 
 	@Override
 	public List<QualityAd> getQualityAds() throws Exception{
-		List<AdVO> adVOList = inMemoryPersistence.findAll();
+		List<AdVO> adVOList = inMemoryPersistence.getAds();
 		if(!verifyIfScoreCalculated(adVOList)) {
 			List<QualityAd> qualityAds = ObjectMapper.mapAll(adVOList,QualityAd.class);
 			return qualityAds;
