@@ -1,5 +1,6 @@
 package com.idealista.infrastructure.persistence;
 
+import com.idealista.config.ScoreValuesConfiguration;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -58,7 +59,7 @@ public class InMemoryPersistence {
 
     public List<AdVO> filterPublicAds() {
         List<AdVO> publicAdVOList = ads.stream().filter(
-            adVO -> adVO.getScore()>=40
+            adVO -> adVO.getScore()>= ScoreValuesConfiguration.IRRELEVANT_AD_SCORE
         ).sorted(Comparator.comparing(AdVO::getScore)).collect(Collectors.toList());
         return publicAdVOList;
     }

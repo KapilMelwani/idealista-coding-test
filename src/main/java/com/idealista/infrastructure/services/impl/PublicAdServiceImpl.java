@@ -17,9 +17,23 @@ public class PublicAdServiceImpl implements IPublicAdService {
 	private InMemoryPersistence inMemoryPersistence;
 
 	@Override
-	public List<PublicAd> getPublicAds(){
-		List<AdVO> adVOList = inMemoryPersistence.filterPublicAds();
-		List<PublicAd> qualityAds = ObjectMapper.mapAll(adVOList,PublicAd.class);
-		return qualityAds;
+	public List<PublicAd> getPublicAds() throws Exception {
+		List<AdVO> adVOList = inMemoryPersistence.findAll();
+		if(!verifyIfScoreCalculated(adVOList)) {
+			List<AdVO> adVOListFiltered = inMemoryPersistence.filterPublicAds();
+			List<PublicAd> qualityAds = ObjectMapper.mapAll(adVOListFiltered,PublicAd.class);
+			return qualityAds;
+		} else {
+			throw new Exception("No se han calculado los score de los anuncios.");
+		}
  	}
+
+ 	private Boolean verifyIfScoreCalculated(List<AdVO> adVOList) {
+		for(AdVO adVO : adVOList) {
+			if(adVO.getScore()==null) {
+				return true;
+			}
+		}
+		return false;
+    }
 }

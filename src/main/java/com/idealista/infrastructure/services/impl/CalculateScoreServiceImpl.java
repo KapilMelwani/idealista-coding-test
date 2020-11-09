@@ -11,28 +11,33 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class CalculateScoreServiceImpl implements ICalculateScoreService {
 
 	@Autowired private InMemoryPersistence inMemoryPersistence;
 
-
 	public List<AdVO> calculateAdScore() {
 		List<AdVO> adVOList = inMemoryPersistence.getAds();
-		adVOList.stream().forEach(
-			adVO -> {
-				initScore(adVO);
-				calculatePhotoScore(adVO);
-				calculateDescriptionScore(adVO);
-				calculateDescriptionSizeScore(adVO);
-				calculateDescriptionKeywordsScore(adVO);
-				calculateFullAdd(adVO);
-				updateScore(adVO);
-				inMemoryPersistence.updateAds(adVOList);
-			}
-		);
-		return adVOList;
+		List<AdVO> adVOListAlreadyCalculated = alreadyCalculated(adVOList);
+		if(adVOListAlreadyCalculated.isEmpty()) {
+			return adVOList;
+		} else {
+			adVOListAlreadyCalculated.stream().forEach(
+				adVO -> {
+					initScore(adVO);
+					calculatePhotoScore(adVO);
+					calculateDescriptionScore(adVO);
+					calculateDescriptionSizeScore(adVO);
+					calculateDescriptionKeywordsScoreCaseInsensitive(adVO);
+					calculateFullAdd(adVO);
+					updateScore(adVO);
+					inMemoryPersistence.updateAds(adVOList);
+				}
+			);
+		}
+		return adVOListAlreadyCalculated;
 	}
 
 
@@ -66,7 +71,7 @@ public class CalculateScoreServiceImpl implements ICalculateScoreService {
 
 	private AdVO calculateDescriptionSizeScore(AdVO adVO) {
 		if(adVO.getDescription()!=null && !adVO.getDescription().isEmpty()){
-			if(adVO.getTypology().equals(ScoreValuesConfiguration.Typology.Piso.toString())) {
+			if(adVO.getTypology().equals(ScoreValuesConfiguration.Typology.FLAT.toString())) {
 				if (adVO.getDescription().length() >= ScoreValuesConfiguration.PISO_DESCRIPTION_BIGGER_THAN && adVO.getDescription().length() <= ScoreValuesConfiguration.PISO_DESCRIPTION_LESS_THAN) {
 					adVO.setScore(adVO.getScore() + ScoreValuesConfiguration.PISO_DESCRIPTION_BETWEEN_SCORE);
 				} else {
@@ -75,7 +80,7 @@ public class CalculateScoreServiceImpl implements ICalculateScoreService {
 					}
 				}
 			} else {
-				if(adVO.getTypology().equals(ScoreValuesConfiguration.Typology.Chalet.toString()) && adVO.getDescription().length() > 49) {
+				if(adVO.getTypology().equals(ScoreValuesConfiguration.Typology.CHALET.toString()) && adVO.getDescription().length() > 49) {
 					adVO.setScore(adVO.getScore() + ScoreValuesConfiguration.CHALET_DESCRIPTION_BIGGER_THAN_SCORE);
 				}
 			}
@@ -85,65 +90,59 @@ public class CalculateScoreServiceImpl implements ICalculateScoreService {
 
 	private AdVO calculateDescriptionKeywordsScore(AdVO adVO) {
 		if(adVO.getDescription()!=null && !adVO.getDescription().isEmpty()) {
-			if(adVO.getDescription().contains(ScoreValuesConfiguration.Keywords.Luminoso.toString())) {
+			if(adVO.getDescription().contains(ScoreValuesConfiguration.Keywords.LUMINOSO.toString())) {
 				adVO.setScore(adVO.getScore() + ScoreValuesConfiguration.KEYWORDS_SCORE);
 			}
-			if(adVO.getDescription().contains(ScoreValuesConfiguration.Keywords.Nuevo.toString())) {
+			if(adVO.getDescription().contains(ScoreValuesConfiguration.Keywords.NUEVO.toString())) {
 				adVO.setScore(adVO.getScore() + ScoreValuesConfiguration.KEYWORDS_SCORE);
 			}
-			if(adVO.getDescription().contains(ScoreValuesConfiguration.Keywords.Céntrico.toString())) {
+			if(adVO.getDescription().contains(ScoreValuesConfiguration.Keywords.CÉNTRICO.toString())) {
 				adVO.setScore(adVO.getScore() + ScoreValuesConfiguration.KEYWORDS_SCORE);
 			}
-			if(adVO.getDescription().contains(ScoreValuesConfiguration.Keywords.Reformado.toString())) {
+			if(adVO.getDescription().contains(ScoreValuesConfiguration.Keywords.REFORMADO.toString())) {
 				adVO.setScore(adVO.getScore() + ScoreValuesConfiguration.KEYWORDS_SCORE);
 			}
-			if(adVO.getDescription().contains(ScoreValuesConfiguration.Keywords.Ático.toString())) {
+			if(adVO.getDescription().contains(ScoreValuesConfiguration.Keywords.ÁTICO.toString())) {
 				adVO.setScore(adVO.getScore() + ScoreValuesConfiguration.KEYWORDS_SCORE);
 			}
 		}
 		return adVO;
 	}
 
-
-	/**
-	 * 	TODO: Comprobar si esto es viable y sería buen toque de calidad, case Insensitive
-	 */
-
-
-	private AdVO calculateDescriptionKeywordsScoreWithoutCaseSensitive(AdVO adVO) {
+	private AdVO calculateDescriptionKeywordsScoreCaseInsensitive(AdVO adVO) {
 		if(adVO.getDescription()!=null && !adVO.getDescription().isEmpty()) {
-			if(containsWithoutCaseSensitive(adVO.getDescription(),ScoreValuesConfiguration.Keywords.Luminoso.toString())) {
-				adVO.setScore(adVO.getScore() + 5);
+			if(containsWithoutCaseSensitive(adVO.getDescription(),ScoreValuesConfiguration.Keywords.LUMINOSO.toString())) {
+				adVO.setScore(adVO.getScore() + ScoreValuesConfiguration.KEYWORDS_SCORE);
 			}
-			if(containsWithoutCaseSensitive(adVO.getDescription(),ScoreValuesConfiguration.Keywords.Nuevo.toString())) {
-				adVO.setScore(adVO.getScore() + 5);
+			if(containsWithoutCaseSensitive(adVO.getDescription(),ScoreValuesConfiguration.Keywords.NUEVO.toString())) {
+				adVO.setScore(adVO.getScore() + ScoreValuesConfiguration.KEYWORDS_SCORE);
 			}
-			if(containsWithoutCaseSensitive(adVO.getDescription(),ScoreValuesConfiguration.Keywords.Céntrico.toString())) {
-				adVO.setScore(adVO.getScore() + 5);
+			if(containsWithoutCaseSensitive(adVO.getDescription(),ScoreValuesConfiguration.Keywords.CÉNTRICO.toString())) {
+				adVO.setScore(adVO.getScore() + ScoreValuesConfiguration.KEYWORDS_SCORE);
 			}
-			if(containsWithoutCaseSensitive(adVO.getDescription(),ScoreValuesConfiguration.Keywords.Reformado.toString())) {
-				adVO.setScore(adVO.getScore() + 5);
+			if(containsWithoutCaseSensitive(adVO.getDescription(),ScoreValuesConfiguration.Keywords.REFORMADO.toString())) {
+				adVO.setScore(adVO.getScore() + ScoreValuesConfiguration.KEYWORDS_SCORE);
 			}
-			if(containsWithoutCaseSensitive(adVO.getDescription(),ScoreValuesConfiguration.Keywords.Ático.toString())) {
-				adVO.setScore(adVO.getScore() + 5);
+			if(containsWithoutCaseSensitive(adVO.getDescription(),ScoreValuesConfiguration.Keywords.ÁTICO.toString())) {
+				adVO.setScore(adVO.getScore() + ScoreValuesConfiguration.KEYWORDS_SCORE);
 			}
 		}
 		return adVO;
 	}
 
-	private Boolean containsWithoutCaseSensitive(String contains, String string) {
-		return Pattern.compile(Pattern.quote(contains), Pattern.CASE_INSENSITIVE).matcher(string).find();
+	private Boolean containsWithoutCaseSensitive(String sentence, String keyword) {
+		return Pattern.compile(Pattern.quote(keyword.toLowerCase()), Pattern.CASE_INSENSITIVE).matcher(sentence).find();
 	}
 
 
 	private AdVO calculateFullAdd(AdVO adVO) {
 		if(!adVO.getPictures().isEmpty()) {
 			if(adVO.getDescription()!=null && !adVO.getDescription().isEmpty()) {
-				if (adVO.getTypology().equals(ScoreValuesConfiguration.Typology.Piso.toString())) {
+				if (adVO.getTypology().equals(ScoreValuesConfiguration.Typology.FLAT.toString())) {
 					if (adVO.getHouseSize() != null) {
 						adVO.setScore(adVO.getScore() + ScoreValuesConfiguration.FULL_AD_PROPERTIES_SCORE);
 					}
-					if (adVO.getTypology().equals(ScoreValuesConfiguration.Typology.Chalet.toString())) {
+					if (adVO.getTypology().equals(ScoreValuesConfiguration.Typology.CHALET.toString())) {
 						if (adVO.getHouseSize() != null) {
 							if (adVO.getGardenSize() != null) {
 								adVO.setScore(adVO.getScore() + ScoreValuesConfiguration.FULL_AD_PROPERTIES_SCORE);
@@ -152,7 +151,7 @@ public class CalculateScoreServiceImpl implements ICalculateScoreService {
 					}
 				}
 			} else {
-				if (adVO.getTypology().equals(ScoreValuesConfiguration.Typology.Garaje.toString())) {
+				if (adVO.getTypology().equals(ScoreValuesConfiguration.Typology.GARAGE.toString())) {
 					if (adVO.getHouseSize() != null) {
 						adVO.setScore(adVO.getScore() + ScoreValuesConfiguration.FULL_AD_PROPERTIES_GARAGE_SCORE);
 					}
@@ -180,5 +179,11 @@ public class CalculateScoreServiceImpl implements ICalculateScoreService {
 		if(adVO.getScore()==null){
 			adVO.setScore(ScoreValuesConfiguration.MIN_AD_SCORE);
 		}
+	}
+
+	private List<AdVO> alreadyCalculated(List<AdVO> adVOs) {
+		return adVOs.stream().filter(
+			adVO -> adVO.getScore()==null
+		).collect(Collectors.toList());
 	}
 }

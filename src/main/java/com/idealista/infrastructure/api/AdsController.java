@@ -27,20 +27,28 @@ public class AdsController {
 
 
     @RequestMapping(method = RequestMethod.GET, value = "/quality")
-    public ResponseEntity<ApiResponse> qualityListing() {
-        List<QualityAd> qualityAds = qualityAdService.getQualityAds();
-        Integer qualityAvg = qualityAdService.calculateQualityScoreAvg();
-        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(),"Quality ads average: " + qualityAvg, qualityAds));
+    public ResponseEntity qualityListing() {
+        try {
+            List<QualityAd> qualityAds = qualityAdService.getQualityAds();
+            Integer qualityAvg = qualityAdService.calculateQualityScoreAvg();
+            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "Quality ads average: " + qualityAvg, qualityAds));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/public")
-    public ResponseEntity<ApiResponse> publicListing() {
-        List<PublicAd> publicAds = publicAdService.getPublicAds();
-        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(),"Public ads:", publicAds));
+    public ResponseEntity publicListing() throws Exception{
+        try {
+            List<PublicAd> publicAds = publicAdService.getPublicAds();
+            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "Public ads:", publicAds));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/calculateScores")
-    public ResponseEntity<ApiResponse> calculateScore() {
+    public ResponseEntity calculateScore() {
         calculateScoreService.calculateAdScore();
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(),"All scores has been calculated", calculateScoreService.calculateAdScore()));
     }

@@ -1,29 +1,27 @@
 package com.idealista.config;
 
-import org.springframework.context.annotation.Configuration;
-
-@Configuration
 public class ScoreValuesConfiguration {
 
+	public ScoreValuesConfiguration() { }
+
 	public enum Keywords {
-		Luminoso,
-		Nuevo,
-		Céntrico,
-		Reformado,
-		Ático
+		LUMINOSO,
+		NUEVO,
+		CÉNTRICO,
+		REFORMADO,
+		ÁTICO
 	}
 
 	public enum Typology {
-		Chalet,
-		Piso,
-		Garaje
+		CHALET,
+		FLAT,
+		GARAGE
 	}
 
 	public enum PhotoQuality {
 		SD,
 		HD,
 	}
-
 
 	public static final Integer MIN_AD_SCORE = 0;
 	public static final Integer MAX_AD_SCORE = 100;
@@ -45,13 +43,4 @@ public class ScoreValuesConfiguration {
 
 	public static final Integer FULL_AD_PROPERTIES_SCORE = 40;
 	public static final Integer FULL_AD_PROPERTIES_GARAGE_SCORE = 40;
-
-
-
-
-
-
-
-
-
 }

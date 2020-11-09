@@ -5,6 +5,6 @@ import com.idealista.infrastructure.api.QualityAd;
 import java.util.List;
 
 public interface IQualityAdService {
-	List<QualityAd> getQualityAds();
+	List<QualityAd> getQualityAds() throws Exception;
 	Integer calculateQualityScoreAvg();
 }

@@ -11,16 +11,20 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class QualityAdService implements IQualityAdService {
+public class QualityAdServiceImpl implements IQualityAdService {
 
 	@Autowired
 	private InMemoryPersistence inMemoryPersistence;
 
 	@Override
-	public List<QualityAd> getQualityAds(){
+	public List<QualityAd> getQualityAds() throws Exception{
 		List<AdVO> adVOList = inMemoryPersistence.findAll();
-		List<QualityAd> qualityAds = ObjectMapper.mapAll(adVOList,QualityAd.class);
-		return qualityAds;
+		if(!verifyIfScoreCalculated(adVOList)) {
+			List<QualityAd> qualityAds = ObjectMapper.mapAll(adVOList,QualityAd.class);
+			return qualityAds;
+		} else {
+			throw new Exception("No se han calculado los score de los anuncios.");
+		}
 	}
 
 	@Override
@@ -30,5 +34,14 @@ public class QualityAdService implements IQualityAdService {
 			avg = inMemoryPersistence.adsAverage();
 		}
 		return avg;
+	}
+
+	private Boolean verifyIfScoreCalculated(List<AdVO> adVOList) {
+		for(AdVO adVO : adVOList) {
+			if(adVO.getScore()==null) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
