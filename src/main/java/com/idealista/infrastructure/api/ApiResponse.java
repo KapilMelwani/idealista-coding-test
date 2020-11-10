@@ -1,9 +1,16 @@
 package com.idealista.infrastructure.api;
 
-public class ApiResponse {
+import java.io.Serializable;
+
+public class ApiResponse implements Serializable {
+
+	private static final long serialVersionUID = -1412028991507311634L;
+
 	private Integer status;
 	private String message;
 	private Object response;
+
+	public ApiResponse() {}
 
 	public ApiResponse(Integer status, String message) {
 		this.status = status;

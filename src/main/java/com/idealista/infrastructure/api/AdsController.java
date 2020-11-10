@@ -32,7 +32,7 @@ public class AdsController {
 
 
     @PreAuthorize("hasRole('ADMIN_QUALITY')")
-    @RequestMapping(method = RequestMethod.GET, value = "/quality", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.GET, value = "/quality")
     public ResponseEntity qualityListing() {
         try {
             List<QualityAd> qualityAds = qualityAdService.getQualityAds();
@@ -41,11 +41,11 @@ public class AdsController {
             return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "Quality ads average: " + qualityAvg, qualityAds));
         } catch (Exception e) {
             logger.info("[GET_PUBLIC_AD] Error getting quality list : " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),e.getMessage()));
         }
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/public", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.GET, value = "/public")
     public ResponseEntity publicListing() throws Exception{
         try {
             List<PublicAd> publicAds = publicAdService.getPublicAds();
@@ -53,12 +53,12 @@ public class AdsController {
             return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "Public ads:", publicAds));
         } catch (Exception e) {
             logger.info("[GET_PUBLIC_AD] Error getting public list : " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),e.getMessage()));
         }
     }
 
     @PreAuthorize("hasRole('ADMIN_QUALITY')")
-    @RequestMapping(method = RequestMethod.PUT, value = "/calculateScores", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.PUT, value = "/calculateScores")
     public ResponseEntity calculateScore() {
         try {
             calculateScoreService.calculateAdScore();
@@ -66,7 +66,7 @@ public class AdsController {
             return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(),"All scores has been calculated", calculateScoreService.calculateAdScore()));
         } catch (Exception e) {
             logger.info("[CALCULATE_SCORES] Error calculating ad's scores");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),e.getMessage()));
         }
 
     }

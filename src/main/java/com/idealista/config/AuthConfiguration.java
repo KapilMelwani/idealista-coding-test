@@ -2,12 +2,15 @@ package com.idealista.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class AuthConfiguration extends WebSecurityConfigurerAdapter {
@@ -27,21 +30,26 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
 				.disable()
 			.authorizeRequests()
 			.antMatchers(HttpMethod.GET, PUBLIC_AD_ENDPOINT)
-				.permitAll()
+			.permitAll()
 			.anyRequest()
-				.authenticated()
+			.authenticated()
 			.and()
-				.formLogin()
-					.permitAll();
+			.formLogin()
+			.permitAll()
+			.and().httpBasic();
 	}
 
-	@Override
+	@Autowired
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		logger.info("[CONFIGURATION] Creating quality user in memory auth");
 		auth.inMemoryAuthentication()
-			.passwordEncoder(new BCryptPasswordEncoder())
-				.withUser(QUALITY_USER)
-				.password(QUALITY_PASSWORD)
-				.roles(QUALITY_USER_ROL);
+			.withUser(QUALITY_USER)
+			.password(getPasswordEnconder().encode(QUALITY_PASSWORD))
+			.roles(QUALITY_USER_ROL);
+	}
+
+	@Bean
+	public PasswordEncoder getPasswordEnconder() {
+		return new BCryptPasswordEncoder();
 	}
 }
