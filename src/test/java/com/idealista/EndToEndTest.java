@@ -38,21 +38,29 @@ public class EndToEndTest {
     @LocalServerPort
     private int port;
 
+    private static String URL_ENVIRONMENT = "http://localhost:";
+    private static String PUBLIC_LIST_ENDPOINT = "/api/ads/public";
+    private static String QUALITY_LIST_ENDPOINT = "/api/ads/quality";
+    private static String CALCULATE_SCORES_ENDPOINT = "/api/ads/calculateScores";
+
+    private static String QUALITY_ADMIN_USERNAME = "qualityAdmin";
+    private static String QUALITY_ADMIN_PASSWORD = "1234";
+
     @Test
     public void getPublicAdsSuccess() {
-        ResponseEntity<ApiResponse> response = template.exchange("http://localhost:" + port + "/api/ads/public", HttpMethod.GET, null, new ParameterizedTypeReference<ApiResponse>() {});
+        ResponseEntity<ApiResponse> response = template.exchange(buildUrl(PUBLIC_LIST_ENDPOINT), HttpMethod.GET, null, new ParameterizedTypeReference<ApiResponse>() {});
         assertThat(response.getBody().getMessage().equals("No se han calculado los score de los anuncios."));
     }
 
     @Test
     public void getQualityAdsSuccess() {
-        ResponseEntity<ApiResponse> response = template.withBasicAuth("qualityAdmin","1234").exchange("http://localhost:" + port + "/api/ads/quality", HttpMethod.GET, null, new ParameterizedTypeReference<ApiResponse>() {});
+        ResponseEntity<ApiResponse> response = authenticate(QUALITY_ADMIN_USERNAME,QUALITY_ADMIN_PASSWORD).exchange(buildUrl(QUALITY_LIST_ENDPOINT), HttpMethod.GET, null, new ParameterizedTypeReference<ApiResponse>() {});
         assertThat(response.getBody().getMessage().equals("No se han calculado los score de los anuncios."));
     }
 
     @Test
     public void calculateScoresSuccess() {
-        ResponseEntity<ApiResponse> response = template.withBasicAuth("qualityAdmin","1234").exchange("http://localhost:" + port + "/api/ads/calculateScores", HttpMethod.PUT, null, new ParameterizedTypeReference<ApiResponse>() {});
+        ResponseEntity<ApiResponse> response = authenticate(QUALITY_ADMIN_USERNAME,QUALITY_ADMIN_PASSWORD).exchange(buildUrl(CALCULATE_SCORES_ENDPOINT), HttpMethod.PUT, null, new ParameterizedTypeReference<ApiResponse>() {});
         List<Map<String,Object>> qualityAd = ((List<Map<String,Object>>) response.getBody().getResponse());
         qualityAd.stream().forEach(
             qAd -> {
@@ -65,5 +73,13 @@ public class EndToEndTest {
                 );
             }
         );
+    }
+
+    private TestRestTemplate authenticate(String username,String password) {
+        return template.withBasicAuth(username,password);
+    }
+
+    private String buildUrl(String endpoint) {
+        return URL_ENVIRONMENT + port + endpoint;
     }
 }

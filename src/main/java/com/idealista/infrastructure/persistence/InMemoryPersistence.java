@@ -94,4 +94,16 @@ public class InMemoryPersistence {
         Integer avg = countScore/ads.size();
         return avg;
     }
+
+    public void setAds(List<AdVO> ads) {
+        this.ads = ads;
+    }
+
+    public List<PictureVO> getPictures() {
+        return pictures;
+    }
+
+    public void setPictures(List<PictureVO> pictures) {
+        this.pictures = pictures;
+    }
 }
