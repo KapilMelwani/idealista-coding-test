@@ -21,6 +21,19 @@ Los supuestos están basados en un hipotético *equipo de gestión de calidad de
 
 * Yo como usuario de idealista quiero poder ver los anuncios ordenados de mejor a peor para encontrar fácilmente mi vivienda.
 
+Una vez analizadas todas las historias de usuario, aplicándolas sobre los anuncios de prueba, obtenemos la siguiente tabla de puntuaciones:
+
+| ID | PHOTO SCORE | DESCRIPTION SCORE | DESCRIPTION SIZE SCORE | KEYWORD SCORE | FULL AD SCORE | TOTAL SCORE |
+|:--:|:-----------:|:-----------------:|:----------------------:|:-------------:|:-------------:|:-----------:|
+|  1 |     -10     |         5         |            0           |       0       |       0       |      -5     |
+|  2 |      20     |         5         |            0           |       20      |       40      |      85     |
+|  3 |      20     |         0         |            0           |       0       |       0       |      20     |
+|  4 |      10     |         5         |            0           |       25      |       40      |      80     |
+|  5 |      30     |         5         |            0           |       0       |       40      |      75     |
+|  6 |      10     |         0         |            0           |       0       |       40      |      50     |
+|  7 |     -10     |         5         |            0           |       0       |       0       |      -5     |
+|  8 |      20     |         5         |            0           |       0       |       0       |      25     |
+
 ## Consideraciones importantes
 
 En este proyecto te proporcionamos un pequeño *esqueleto* escrito en Java usando [Spring Boot](https://spring.io/projects/spring-boot).
